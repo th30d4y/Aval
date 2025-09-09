@@ -5,7 +5,10 @@ __pycache__/
 
 # C extensions
 *.so
-
+#wav files
+*.wav
+*.zip
+*.tar.gz
 # Distribution / packaging
 .Python
 build/
