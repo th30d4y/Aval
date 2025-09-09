@@ -1,0 +1,24 @@
+{
+  "model_name": "Aval Multimodal Safety Detection",
+  "version": "1.0",
+  "input_shapes": {
+    "imu_input": [
+      60,
+      6
+    ],
+    "audio_input": [
+      13
+    ],
+    "emotion_input": [
+      7
+    ]
+  },
+  "output_shape": [
+    1
+  ],
+  "classes": [
+    "Safe",
+    "Unsafe"
+  ],
+  "note": "TFLite model requires SELECT_TF_OPS due to LSTM layers"
+}
