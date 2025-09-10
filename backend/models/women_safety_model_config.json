@@ -1,0 +1,48 @@
+{
+  "model_info": {
+    "name": "Complete Women Safety Model with Audio Analysis",
+    "version": "2.0",
+    "accuracy": 0.928,
+    "features": [
+      "area_encoded",
+      "time_hour",
+      "day_of_week",
+      "lighting",
+      "crowd_level",
+      "emergency_words",
+      "voice_distress",
+      "voice_pitch",
+      "voice_energy",
+      "fear_level",
+      "help_gesture",
+      "location_isolation"
+    ],
+    "supported_languages": [
+      "tamil",
+      "hindi",
+      "english",
+      "bengali",
+      "telugu"
+    ]
+  },
+  "usage": {
+    "joblib_model": "women_safety_complete_model.joblib",
+    "keras_model": "women_safety_complete_model.h5",
+    "mobile_code": "women_safety_mobile_integration.py"
+  },
+  "audio_analysis": {
+    "supported_formats": [
+      "wav",
+      "mp3",
+      "flac"
+    ],
+    "sample_rate": 16000,
+    "languages": [
+      "tamil",
+      "hindi",
+      "english",
+      "bengali",
+      "telugu"
+    ]
+  }
+}
