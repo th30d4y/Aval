@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Women Safety Predictor</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+  }
+  h1 {
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .form-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #333;
+  }
+  input, select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: 2px solid #ddd;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+  button {
+    margin-top: 25px;
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+  }
+  button:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .result {
+    margin-top: 30px;
+    padding: 25px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .safe {
+    background-color: #d4edda;
+    border: 2px solid #c3e6cb;
+    color: #155724;
+  }
+  .moderate {
+    background-color: #fff3cd;
+    border: 2px solid #ffeaa7;
+    color: #856404;
+  }
+  .danger {
+    background-color: #f8d7da;
+    border: 2px solid #f5c6cb;
+    color: #721c24;
+  }
+  .result h2 {
+    margin: 0 0 15px 0;
+    font-size: 24px;
+  }
+  .result p {
+    margin: 10px 0;
+    font-size: 16px;
+  }
+</style>
+</head>
+<body>
+  <h1>🛡️ Women Safety Predictor</h1>
+  
+  <div class="form-container">
+    <form id="safetyForm">
+      <label for="area_type">📍 Area Type</label>
+      <select id="area_type" name="area_type">
+        <option value="safe">Safe Area</option>
+        <option value="risky">Risky Area</option>
+        <option value="isolated">Isolated Area</option>
+      </select>
+
+      <label for="time_hour">🕐 Time Hour (0-23)</label>
+      <input type="number" id="time_hour" name="time_hour" min="0" max="23" value="12" />
+
+      <label for="lighting">💡 Lighting Quality (1-5)</label>
+      <input type="number" id="lighting" name="lighting" min="1" max="5" value="3" />
+
+      <label for="crowd_level">👥 Crowd Level (1-5)</label>
+      <input type="number" id="crowd_level" name="crowd_level" min="1" max="5" value="3" />
+
+      <label for="emergency_words">🚨 Emergency Words Count</label>
+      <input type="number" id="emergency_words" name="emergency_words" min="0" value="0" />
+
+      <label for="voice_distress">🎤 Voice Distress Level (0-1)</label>
+      <input type="number" id="voice_distress" name="voice_distress" min="0" max="1" step="0.1" value="0" />
+
+      <label for="fear_level">😰 Fear Level (0-1)</label>
+      <input type="number" id="fear_level" name="fear_level" min="0" max="1" step="0.1" value="0" />
+
+      <button type="submit" id="predictBtn">🔍 Analyze Safety</button>
+    </form>
+  </div>
+
+  <div id="result" class="result" style="display: none;"></div>
+
+  <script>
+    document.getElementById('safetyForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const form = e.target;
+      const button = document.getElementById('predictBtn');
+      const resultDiv = document.getElementById('result');
+      
+      // Disable button and show loading
+      button.disabled = true;
+      button.textContent = '🔄 Analyzing...';
+
+      const features = {
+        area_type: form.area_type.value,
+        time_hour: parseInt(form.time_hour.value),
+        lighting: parseFloat(form.lighting.value),
+        crowd_level: parseFloat(form.crowd_level.value),
+        emergency_words: parseInt(form.emergency_words.value),
+        voice_distress: parseFloat(form.voice_distress.value),
+        fear_level: parseFloat(form.fear_level.value)
+      };
+
+      try {
+        const response = await fetch('http://localhost:5000/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ features })
+        });
+
+        const data = await response.json();
+        
+        if (data.error) {
+          resultDiv.innerHTML = `<div class='danger'>❌ Error: ${data.error}</div>`;
+          resultDiv.style.display = 'block';
+          return;
+        }
+
+        let cssClass = '';
+        let icon = '';
+        let message = '';
+        
+        if (data.prediction === 0) {
+          cssClass = 'safe';
+          icon = '🟢';
+          message = 'SAFE';
+        } else if (data.prediction === 1) {
+          cssClass = 'moderate';
+          icon = '🟡';
+          message = 'MEDIUM RISK';
+        } else {
+          cssClass = 'danger';
+          icon = '🔴';
+          message = 'HIGH RISK';
+        }
+
+        resultDiv.className = `result ${cssClass}`;
+        resultDiv.innerHTML = `
+          <h2>${icon} ${message}</h2>
+          <p><strong>Confidence:</strong> ${(data.confidence * 100).toFixed(1)}%</p>
+          <p><strong>Alert Required:</strong> ${data.alert_required ? '⚠️ YES' : '✅ NO'}</p>
+          <p><strong>Emergency Response:</strong> ${data.emergency_response ? '🚨 YES' : 'NO'}</p>
+          <p><em>Analysis completed at ${new Date().toLocaleTimeString()}</em></p>
+        `;
+        resultDiv.style.display = 'block';
+
+        // Show alert for high risk
+        if (data.emergency_response) {
+          alert('🚨 HIGH RISK DETECTED!\n\nConsider seeking immediate help and moving to a safer location.');
+        }
+
+      } catch (error) {
+        console.error('API Error:', error);
+        resultDiv.className = 'result danger';
+        resultDiv.innerHTML = `
+          <h2>❌ Connection Error</h2>
+          <p>Unable to connect to the backend API.</p>
+          <p>Make sure your Flask server is running on http://localhost:5000</p>
+        `;
+        resultDiv.style.display = 'block';
+      } finally {
+        // Re-enable button
+        button.disabled = false;
+        button.textContent = '🔍 Analyze Safety';
+      }
+    });
+  </script>
+</body>
+</html>
