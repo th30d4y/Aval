@@ -123,8 +123,8 @@ def predict():
         return jsonify(response)
         
     except Exception as e:
-        logger.error(f"Prediction error: {e}")
-        return jsonify({'error': f'Prediction failed: {str(e)}'}), 400
+        logger.error(f"Prediction error: {e}", exc_info=True)
+        return jsonify({'error': 'Prediction failed due to an internal error.'}), 400
 
 @app.route('/health')
 def health_check():
